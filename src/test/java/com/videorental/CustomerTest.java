@@ -4,8 +4,15 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class CustomerTest {
+
+    private static final String NAME = "NAME_NOT_IMPORTANT";
+    private static final String TITLE = "TITLE_NOT_IMPORTANT";
+
+    private final Customer customer = new Customer(NAME);
+
 
     static Movie regular;
     static Movie childrens;
@@ -13,14 +20,37 @@ public class CustomerTest {
 
     @BeforeAll
     static void setup(){
-        regular = new Movie("regular", Movie.REGULAR);
-        childrens = new Movie("childrens", Movie.CHILDRENS);
-        newRelease = new Movie("new release", Movie.NEW_RELEASE);
+        regular = getMovie(Movie.REGULAR);
+        childrens = getMovie(Movie.CHILDRENS);
+        newRelease = getMovie(Movie.NEW_RELEASE);
+    }
+
+    private static Movie getMovie(int priceCode) {
+        return switch (priceCode){
+            case Movie.REGULAR -> new RegularMovie(TITLE);
+            case Movie.NEW_RELEASE -> new NewReleaseMovie(TITLE);
+            case Movie.CHILDRENS -> new ChildrensMovie(TITLE);
+            default -> null;
+        };
+    }
+
+    @Test
+    void createCustomer(){
+        assertNotNull(customer);
+    }
+
+    @Test
+    void noRental(){
+        String statement = customer.statement();
+
+        assertEquals("""
+Rental Record for NAME_NOT_IMPORTANT
+Amount owed is 0.0
+You earned 0 frequent renter pointers""", statement);
     }
 
     @Test
     void regularRentalTwoDays(){
-        Customer customer = new Customer("test");
         Rental[] rentals = new Rental[]{
                 new Rental(regular, 2)
         };
@@ -32,15 +62,14 @@ public class CustomerTest {
         String statement = customer.statement();
 
         assertEquals("""
-Rental Record for test
-	2.0(regular)
+Rental Record for NAME_NOT_IMPORTANT
+	2.0(TITLE_NOT_IMPORTANT)
 Amount owed is 2.0
 You earned 1 frequent renter pointers""", statement);
     }
 
     @Test
     void regularRentalThreeDays(){
-        Customer customer = new Customer("test");
         Rental[] rentals = new Rental[]{
                 new Rental(regular, 3)
         };
@@ -52,15 +81,14 @@ You earned 1 frequent renter pointers""", statement);
         String statement = customer.statement();
 
         assertEquals("""
-Rental Record for test
-	3.5(regular)
+Rental Record for NAME_NOT_IMPORTANT
+	3.5(TITLE_NOT_IMPORTANT)
 Amount owed is 3.5
 You earned 1 frequent renter pointers""", statement);
     }
 
     @Test
     void childrensRentalThreeDays(){
-        Customer customer = new Customer("test");
         Rental[] rentals = new Rental[]{
                 new Rental(childrens, 3)
         };
@@ -72,15 +100,14 @@ You earned 1 frequent renter pointers""", statement);
         String statement = customer.statement();
 
         assertEquals("""
-Rental Record for test
-	1.5(childrens)
+Rental Record for NAME_NOT_IMPORTANT
+	1.5(TITLE_NOT_IMPORTANT)
 Amount owed is 1.5
 You earned 1 frequent renter pointers""", statement);
     }
 
     @Test
     void childrensRentalFourDays(){
-        Customer customer = new Customer("test");
         Rental[] rentals = new Rental[]{
                 new Rental(childrens, 4)
         };
@@ -91,15 +118,14 @@ You earned 1 frequent renter pointers""", statement);
 
         String statement = customer.statement();
         assertEquals("""
-Rental Record for test
-	3.0(childrens)
+Rental Record for NAME_NOT_IMPORTANT
+	3.0(TITLE_NOT_IMPORTANT)
 Amount owed is 3.0
 You earned 1 frequent renter pointers""", statement);
     }
 
     @Test
     void newReleaseRentalOneDay(){
-        Customer customer = new Customer("test");
         Rental[] rentals = new Rental[]{
                 new Rental(newRelease, 1)
         };
@@ -111,15 +137,14 @@ You earned 1 frequent renter pointers""", statement);
         String statement = customer.statement();
 
         assertEquals("""
-Rental Record for test
-	3.0(new release)
+Rental Record for NAME_NOT_IMPORTANT
+	3.0(TITLE_NOT_IMPORTANT)
 Amount owed is 3.0
 You earned 1 frequent renter pointers""", statement);
     }
 
     @Test
     void newReleaseRentalTwoDays(){
-        Customer customer = new Customer("test");
         Rental[] rentals = new Rental[]{
                 new Rental(newRelease, 2)
         };
@@ -131,15 +156,14 @@ You earned 1 frequent renter pointers""", statement);
         String statement = customer.statement();
 
         assertEquals("""
-Rental Record for test
-	6.0(new release)
+Rental Record for NAME_NOT_IMPORTANT
+	6.0(TITLE_NOT_IMPORTANT)
 Amount owed is 6.0
 You earned 2 frequent renter pointers""", statement);
     }
 
     @Test
     void multipleRentals(){
-        Customer customer = new Customer("test");
         Rental[] rentals = new Rental[]{
                 new Rental(newRelease, 2),
                 new Rental(childrens, 5),
@@ -153,10 +177,10 @@ You earned 2 frequent renter pointers""", statement);
         String statement = customer.statement();
 
         assertEquals("""
-Rental Record for test
-	6.0(new release)
-	4.5(childrens)
-	2.0(regular)
+Rental Record for NAME_NOT_IMPORTANT
+	6.0(TITLE_NOT_IMPORTANT)
+	4.5(TITLE_NOT_IMPORTANT)
+	2.0(TITLE_NOT_IMPORTANT)
 Amount owed is 12.5
 You earned 4 frequent renter pointers""", statement);
     }

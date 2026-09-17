@@ -16,4 +16,18 @@ class Rental {
 	public Movie getMovie() {
 		return movie;
 	}
+
+	public double getCharge() {
+		return getMovie().getChargeFor(getDaysRented());
+	}
+
+
+	public int getFrequentRenterPoints() {
+		// add frequent renter points
+		int frequentRenterPoints = 0;
+		// add bonus for a two day new release rental
+		if ((getMovie() instanceof NewReleaseMovie) && getDaysRented() > 1)
+			frequentRenterPoints++;
+		return frequentRenterPoints;
+	}
 }
